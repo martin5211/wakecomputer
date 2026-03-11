@@ -1,0 +1,14 @@
+[Unit]
+Description=WakeComputer: Alexa Wake-on-LAN Skill
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wakecomputer /etc/wakecomputer/config.yaml
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

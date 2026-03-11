@@ -1,0 +1,8 @@
+listen: "127.0.0.1:9876"
+api_token: "your-server-token"
+machines:
+  - name: workstation
+    mac: "00:AA:BB:CC:DD:EE"
+    ip: "192.168.1.2"
+    agent_port: 9877
+    agent_token: "your-agent-token"

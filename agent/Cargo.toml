@@ -1,0 +1,6 @@
+[package]
+name = "wakecomputer-agent"
+version = "0.1.0"
+edition = "2024"
+description = "Shutdown agent for wakecomputer — runs on target machines"
+license = "MIT"
