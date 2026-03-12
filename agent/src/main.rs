@@ -145,6 +145,8 @@ fn respond(stream: &mut impl Write, status: u16, body: &str) -> std::io::Result<
 fn do_shutdown() {
     let result = if cfg!(target_os = "windows") {
         Command::new("shutdown").args(["/s", "/t", "1"]).spawn()
+    } else if cfg!(target_os = "macos") {
+        Command::new("shutdown").args(["-h", "now"]).spawn()
     } else {
         Command::new("shutdown").arg("now").spawn()
     };

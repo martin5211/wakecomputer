@@ -60,6 +60,16 @@ install.bat <token>
 
 This installs the binary to `%ProgramFiles%\wakecomputer-agent\`, creates a Windows service, and opens firewall port 9877.
 
+#### macOS
+
+Run `agent/install_macos.sh` as root:
+
+```bash
+sudo ./install_macos.sh <token>
+```
+
+This installs the binary to `/usr/local/bin/`, creates a launchd daemon, and starts it. Logs go to `/var/log/wakecomputer-agent.log`.
+
 #### Linux (Debian/Ubuntu)
 
 Run `agent/install.sh` as root:
@@ -88,6 +98,9 @@ cargo build -p wakecomputer-agent --release --target x86_64-pc-windows-msvc
 # Agent (for Windows, cross-compile from Linux with MinGW-w64)
 rustup target add x86_64-pc-windows-gnu
 cargo build -p wakecomputer-agent --release --target x86_64-pc-windows-gnu
+
+# Agent (for macOS ARM, native build on Apple Silicon)
+cargo build -p wakecomputer-agent --release --target aarch64-apple-darwin
 
 # Agent (for Linux)
 cargo build -p wakecomputer-agent --release

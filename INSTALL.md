@@ -124,6 +124,29 @@ cargo build -p wakecomputer-agent --release
    netsh advfirewall firewall add rule name="wakecomputer-agent" dir=in action=allow protocol=TCP localport=9877
    ```
 
+### Deploy on macOS
+
+1. Build the agent on your Mac (or cross-compile for `aarch64-apple-darwin`):
+   ```bash
+   cargo build -p wakecomputer-agent --release
+   ```
+2. Run the installer:
+   ```bash
+   sudo ./agent/install_macos.sh YOUR_TOKEN
+   ```
+   This installs a launchd daemon that starts on boot and restarts if it crashes.
+3. Verify it's running:
+   ```bash
+   curl http://localhost:9877/health
+   ```
+4. Logs: `/var/log/wakecomputer-agent.log`
+
+To uninstall:
+```bash
+sudo launchctl bootout system/com.wakecomputer.agent
+sudo rm /usr/local/bin/wakecomputer-agent /Library/LaunchDaemons/com.wakecomputer.agent.plist
+```
+
 ### Deploy on Linux
 
 1. Copy the binary and create a systemd service, or run directly:
