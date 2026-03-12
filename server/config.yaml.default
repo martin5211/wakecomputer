@@ -1,5 +1,10 @@
 listen: "127.0.0.1:9876"
 api_token: "your-server-token"
+
+wol:
+  broadcast_address: "255.255.255.255:9"   # :7 for Linux
+  multicast_enabled: false
+
 machines:
   - name: workstation
     mac: "00:AA:BB:CC:DD:EE"

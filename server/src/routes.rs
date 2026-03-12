@@ -72,7 +72,7 @@ async fn wake(
         .find_machine(&req.machine)
         .ok_or_else(|| AppError::MachineNotFound(req.machine.clone()).into_response())?;
 
-    wol::send_magic_packet(&m.mac)
+    wol::send_magic_packet(&m.mac, &config.wol)
         .await
         .map_err(|e| e.into_response())?;
 

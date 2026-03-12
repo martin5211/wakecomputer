@@ -1,8 +1,12 @@
+use std::net::Ipv4Addr;
+use std::time::Duration;
+
 use tokio::net::UdpSocket;
 
+use crate::config::WolConfig;
 use crate::errors::AppError;
 
-pub async fn send_magic_packet(mac: &str) -> Result<(), AppError> {
+pub async fn send_magic_packet(mac: &str, wol: &WolConfig) -> Result<(), AppError> {
     let mac_bytes = parse_mac(mac)?;
 
     let mut packet = [0u8; 102];
@@ -16,13 +20,24 @@ pub async fn send_magic_packet(mac: &str) -> Result<(), AppError> {
         .await
         .map_err(|e| AppError::Wol(format!("bind: {e}")))?;
 
-    socket
-        .set_broadcast(true)
-        .map_err(|e| AppError::Wol(format!("set_broadcast: {e}")))?;
+    if wol.multicast_enabled {
+        let addr: std::net::SocketAddr = wol.broadcast_address.parse().map_err(|e| {
+            AppError::Wol(format!("invalid broadcast_address '{}': {e}", wol.broadcast_address))
+        })?;
+        if let std::net::IpAddr::V4(multicast_ip) = addr.ip() {
+            socket
+                .join_multicast_v4(multicast_ip, Ipv4Addr::UNSPECIFIED)
+                .map_err(|e| AppError::Wol(format!("join_multicast_v4: {e}")))?;
+        }
+    } else {
+        socket
+            .set_broadcast(true)
+            .map_err(|e| AppError::Wol(format!("set_broadcast: {e}")))?;
+    }
 
-    socket
-        .send_to(&packet, "255.255.255.255:9")
+    tokio::time::timeout(Duration::from_secs(5), socket.send_to(&packet, &wol.broadcast_address))
         .await
+        .map_err(|_| AppError::Wol("send timed out after 5s".to_string()))?
         .map_err(|e| AppError::Wol(format!("send: {e}")))?;
 
     tracing::info!(mac = mac, "magic packet sent");
